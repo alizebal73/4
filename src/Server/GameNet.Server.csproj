@@ -5,6 +5,7 @@
     <AssemblyName>GameNet.Server</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <ProjectReference Include="..\Shared\GameNet.Shared.csproj" />
   </ItemGroup>
 </Project>
