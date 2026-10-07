@@ -1,4 +1,5 @@
 using GameNet.Domain;
+using Xunit;
 
 namespace GameNet.Domain.Tests;
 
