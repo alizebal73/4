@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  verify:
     runs-on: windows-latest
     timeout-minutes: 15
 
@@ -24,3 +24,6 @@ jobs:
 
       - name: Build
         run: dotnet build GameNetManager.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test GameNetManager.sln --configuration Release --no-build --no-restore
