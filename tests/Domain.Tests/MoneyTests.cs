@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace GameNet.Domain.Tests;
 
 public sealed class MoneyTests
