@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
 namespace GameNet.Agent;
 
 public sealed class Worker(ILogger<Worker> logger) : BackgroundService
