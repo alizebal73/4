@@ -1,0 +1,36 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameNet.Server", "src\Server\GameNet.Server.csproj", "{A7B2E1D4-8AC7-4A75-9D6C-8D8A8D2B1101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameNet.Shared", "src\Shared\GameNet.Shared.csproj", "{B7C2E1D4-8AC7-4A75-9D6C-8D8A8D2B1102}"
+EndProject
+Project("{60DC8134-BA46-4BBA-9825-94A1C78D9210}") = "GameNet.Desktop", "src\Desktop\GameNet.Desktop.csproj", "{C7D2E1D4-8AC7-4A75-9D6C-8D8A8D2B1103}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameNet.Agent", "src\Agent\GameNet.Agent.csproj", "{D7E2E1D4-8AC7-4A75-9D6C-8D8A8D2B1104}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A7B2E1D4-8AC7-4A75-9D6C-8D8A8D2B1101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B2E1D4-8AC7-4A75-9D6C-8D8A8D2B1101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B2E1D4-8AC7-4A75-9D6C-8D8A8D2B1101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B2E1D4-8AC7-4A75-9D6C-8D8A8D2B1101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7C2E1D4-8AC7-4A75-9D6C-8D8A8D2B1102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7C2E1D4-8AC7-4A75-9D6C-8D8A8D2B1102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7C2E1D4-8AC7-4A75-9D6C-8D8A8D2B1102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7C2E1D4-8AC7-4A75-9D6C-8D8A8D2B1102}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7D2E1D4-8AC7-4A75-9D6C-8D8A8D2B1103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7D2E1D4-8AC7-4A75-9D6C-8D8A8D2B1103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7D2E1D4-8AC7-4A75-9D6C-8D8A8D2B1103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7D2E1D4-8AC7-4A75-9D6C-8D8A8D2B1103}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7E2E1D4-8AC7-4A75-9D6C-8D8A8D2B1104}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7E2E1D4-8AC7-4A75-9D6C-8D8A8D2B1104}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7E2E1D4-8AC7-4A75-9D6C-8D8A8D2B1104}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7E2E1D4-8AC7-4A75-9D6C-8D8A8D2B1104}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
