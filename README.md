@@ -14,6 +14,16 @@ Clean rebuild of the GameNet/CyberCafe management system.
 - Shared code contains versioned contracts/primitives only.
 - Production code has no mock/fake data source.
 
+## Engineering memory
+
+The lessons carried into 4 are recorded in:
+
+docs/engineering/lessons-from-2-and-3.md
+
+That document captures both sides of the history: the concrete failure patterns corrected in Repo 2 and the over-correction of Repo 3 into a large pre-feature Foundation program.
+
+The rule is simple: structural rules protect the architecture, but a real feature is not considered complete until its actual invariants, authorization/ownership, persistence behavior, concurrency cases and runtime path are tested and verified.
+
 ## Build order
 
 1. Lean platform baseline
@@ -27,4 +37,4 @@ Clean rebuild of the GameNet/CyberCafe management system.
 9. Reports/approvals/settings
 10. Packaging, update and recovery hardening after the real product path works
 
-Earlier projects became unstable by growing a large pre-feature foundation. Project 4 intentionally avoids that pattern.
+Earlier projects became unstable in two different ways: Repo 2 grew business complexity without strong enough boundaries, while Repo 3 grew the pre-feature foundation far beyond the first real product slice. Project 4 deliberately avoids both patterns.
