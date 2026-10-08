@@ -48,8 +48,20 @@ public sealed class AgentService(
         }
 
         var accessToken = tokenGenerator.Generate();
-        agent.CompletePairing(displayName, tokenGenerator.Hash(accessToken));
-        await store.SaveChangesAsync(cancellationToken);
+
+        agent.CompletePairing(
+            displayName,
+            tokenGenerator.Hash(accessToken));
+
+        try
+        {
+            await store.SaveChangesAsync(cancellationToken);
+        }
+        catch (ConcurrencyConflictException)
+        {
+            return null;
+        }
+
         return accessToken;
     }
 
@@ -66,7 +78,16 @@ public sealed class AgentService(
         }
 
         var leaseVersion = agent.OpenLease(connectionId, clock.UtcNow);
-        await store.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await store.SaveChangesAsync(cancellationToken);
+        }
+        catch (ConcurrencyConflictException)
+        {
+            return null;
+        }
+
         return leaseVersion;
     }
 
@@ -85,12 +106,21 @@ public sealed class AgentService(
 
         var accepted = agent.Heartbeat(connectionId, leaseVersion, clock.UtcNow);
 
-        if (accepted)
+        if (!accepted)
+        {
+            return false;
+        }
+
+        try
         {
             await store.SaveChangesAsync(cancellationToken);
         }
+        catch (ConcurrencyConflictException)
+        {
+            return false;
+        }
 
-        return accepted;
+        return true;
     }
 
     public async Task DisconnectAsync(
@@ -106,7 +136,15 @@ public sealed class AgentService(
         }
 
         agent.Disconnect(connectionId, clock.UtcNow);
-        await store.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await store.SaveChangesAsync(cancellationToken);
+        }
+        catch (ConcurrencyConflictException)
+        {
+            // A newer connection or presence update already owns the Agent row.
+        }
     }
 
     public async Task<bool> BindAsync(
