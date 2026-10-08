@@ -1,4 +1,3 @@
-using GameNet.Application.Agents;
 using GameNet.Application.Foundation;
 
 namespace GameNet.Server.Background;
@@ -28,7 +27,14 @@ public sealed class AgentPresenceMonitor(
                 logger.LogError(exception, "Agent presence monitor failed.");
             }
 
-            await Task.Delay(PollInterval, stoppingToken);
+            try
+            {
+                await Task.Delay(PollInterval, stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                return;
+            }
         }
     }
 
