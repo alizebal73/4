@@ -39,8 +39,7 @@ public partial class InitialSlice1 : Migration
                 Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                 Type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                 Lifecycle = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                AgentDeviceId = table.Column<Guid>(type: "uuid", nullable: true)
+                CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
             },
             constraints: table =>
             {
