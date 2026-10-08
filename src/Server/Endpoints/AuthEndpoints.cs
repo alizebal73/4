@@ -10,6 +10,7 @@ public static class AuthEndpoints
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/auth/login", LoginAsync);
+        app.MapPost("/api/auth/logout", LogoutAsync);
         app.MapGet("/api/auth/me", MeAsync);
         return app;
     }
@@ -50,6 +51,24 @@ public static class AuthEndpoints
                 operatorAccount.UserName,
                 operatorAccount.DisplayName,
                 operatorAccount.Role.ToString())));
+    }
+
+    private static async Task<IResult> LogoutAsync(
+        HttpContext context,
+        OperatorAuthService auth,
+        CancellationToken cancellationToken)
+    {
+        var header = context.Request.Headers.Authorization.ToString();
+
+        if (!header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Results.NoContent();
+        }
+
+        var token = header["Bearer ".Length..].Trim();
+        await auth.RevokeAsync(token, cancellationToken);
+
+        return Results.NoContent();
     }
 
     private static async Task<IResult> MeAsync(
