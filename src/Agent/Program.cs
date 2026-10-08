@@ -8,7 +8,8 @@ if (args.Length > 0 &&
     {
         Console.Error.WriteLine(
             "Usage: GameNet.Manager.Agent.exe --pair <serverUrl> <deviceId> <pairingCode> <displayName>");
-        return 2;
+        Environment.ExitCode = 2;
+        return;
     }
 
     var credentialStore = new AgentCredentialStore();
@@ -25,7 +26,8 @@ if (args.Length > 0 &&
         ? "Agent paired successfully."
         : "Agent pairing failed.");
 
-    return paired ? 0 : 1;
+    Environment.ExitCode = paired ? 0 : 1;
+    return;
 }
 
 var builder = Host.CreateApplicationBuilder(args);
