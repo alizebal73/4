@@ -1,5 +1,3 @@
-using Xunit;
-
 using GameNet.Domain.Agents;
 
 namespace GameNet.Domain.Tests;
@@ -14,7 +12,6 @@ public sealed class AgentDeviceTests
 
         agent.CompletePairing("PC 01", "credential");
         var firstLease = agent.OpenLease("connection-a", now);
-
         var secondLease = agent.OpenLease("connection-b", now.AddSeconds(1));
 
         Assert.NotEqual(firstLease, secondLease);
@@ -33,7 +30,6 @@ public sealed class AgentDeviceTests
         Assert.False(agent.CanPair("hash", created.AddMinutes(1)));
         Assert.True(agent.CanPair("hash", created.AddSeconds(30)));
     }
-}
 
     [Fact]
     public void Online_Agent_Becomes_Stale_After_Heartbeat_Timeout()
@@ -42,13 +38,40 @@ public sealed class AgentDeviceTests
         var agent = AgentDevice.Register("PC-03", created);
 
         agent.CompletePairing("PC 03", "credential");
-        agent.OpenLease("connection-a", created);
+        var lease = agent.OpenLease("connection-a", created);
 
-        Assert.True(agent.ShouldBecomeStale(created.AddSeconds(31), TimeSpan.FromSeconds(30)));
+        Assert.True(agent.ShouldBecomeStale(
+            created.AddSeconds(31),
+            TimeSpan.FromSeconds(30)));
 
         agent.MarkStale(created.AddSeconds(31));
 
         Assert.Equal(AgentState.Stale, agent.State);
         Assert.Null(agent.ConnectionId);
-        Assert.False(agent.Heartbeat("connection-a", 1, created.AddSeconds(32)));
+        Assert.False(agent.Heartbeat(
+            "connection-a",
+            lease,
+            created.AddSeconds(32)));
     }
+
+    [Fact]
+    public void Pairing_And_Lease_Operations_Advance_Concurrency_Version()
+    {
+        var created = DateTimeOffset.Parse("2026-10-08T00:00:00Z");
+        var agent = AgentDevice.Register("PC-04", created);
+
+        var initialVersion = agent.Version;
+        agent.SetPairingCode("hash", created.AddMinutes(1));
+        var pairingVersion = agent.Version;
+
+        agent.CompletePairing("PC 04", "credential");
+        var pairedVersion = agent.Version;
+
+        agent.OpenLease("connection-a", created);
+        var leaseVersion = agent.Version;
+
+        Assert.NotEqual(initialVersion, pairingVersion);
+        Assert.NotEqual(pairingVersion, pairedVersion);
+        Assert.NotEqual(pairedVersion, leaseVersion);
+    }
+}
