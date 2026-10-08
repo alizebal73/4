@@ -88,6 +88,13 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
             x => x.CredentialHash == credentialHash,
             cancellationToken);
 
+    public Task<AgentDevice?> FindAgentByStationIdAsync(
+        Guid stationId,
+        CancellationToken cancellationToken) =>
+        db.AgentDevices.SingleOrDefaultAsync(
+            x => x.StationId == stationId,
+            cancellationToken);
+
     public Task AddAgentAsync(
         AgentDevice agent,
         CancellationToken cancellationToken) =>
