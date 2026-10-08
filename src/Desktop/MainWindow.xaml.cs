@@ -1,47 +1,107 @@
+using System.Collections.ObjectModel;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Windows;
-using GameNet.Contracts.Foundation;
+using GameNet.Contracts.Stations;
+using GameNet.Desktop.Api;
 
 namespace GameNet.Desktop;
 
 public partial class MainWindow
 {
-    private static readonly Uri ServerBaseUri =
-        new("http://127.0.0.1:5080/");
+    private readonly GameNetApiClient _apiClient = new();
 
-    private readonly HttpClient _httpClient = new()
-    {
-        BaseAddress = ServerBaseUri,
-        Timeout = TimeSpan.FromSeconds(5)
-    };
+    public ObservableCollection<StationDto> Stations { get; } = [];
 
     public MainWindow()
     {
         InitializeComponent();
-        Loaded += async (_, _) => await RefreshAsync();
+        DataContext = this;
     }
 
-    private async void Refresh_Click(object sender, RoutedEventArgs e)
+    private async void Login_Click(object sender, RoutedEventArgs e)
     {
-        await RefreshAsync();
+        await ExecuteAsync(
+            LoginButton,
+            LoginStatus,
+            async () => await LoginAsync(
+                UserNameBox.Text,
+                PasswordBox.Password));
     }
 
-    private async Task RefreshAsync()
+    private async void RefreshStations_Click(object sender, RoutedEventArgs e)
     {
-        StatusText.Text = "در حال بررسی...";
+        await LoadStationsAsync();
+    }
+
+    private async Task LoginAsync(string userName, string password)
+    {
+        var response = await _apiClient.LoginAsync(
+            userName,
+            password,
+            CancellationToken.None);
+
+        if (response is null)
+        {
+            LoginStatus.Text = "نام کاربری یا رمز عبور اشتباه است.";
+            return;
+        }
+
+        OperatorText.Text =
+            $"GameNet Manager 4 — {response.Operator.DisplayName} ({response.Operator.Role})";
+
+        LoginPanel.Visibility = Visibility.Collapsed;
+        DashboardPanel.Visibility = Visibility.Visible;
+
+        await LoadStationsAsync();
+    }
+
+    private async Task LoadStationsAsync()
+    {
+        try
+        {
+            Stations.Clear();
+
+            foreach (var station in await _apiClient.GetStationsAsync(CancellationToken.None))
+            {
+                Stations.Add(station);
+            }
+
+            LoginStatus.Text = $"تعداد ایستگاه‌ها: {Stations.Count}";
+        }
+        catch (Exception exception) when (
+            exception is HttpRequestException or TaskCanceledException)
+        {
+            LoginStatus.Text = "Server در دسترس نیست.";
+        }
+    }
+
+    private static async Task ExecuteAsync(
+        System.Windows.Controls.Button button,
+        System.Windows.Controls.TextBlock status,
+        Func<Task> operation)
+    {
+        button.IsEnabled = false;
+        status.Text = "در حال انجام...";
 
         try
         {
-            var health = await _httpClient.GetFromJsonAsync<HealthResponse>("api/health");
-
-            StatusText.Text = health is null
-                ? "پاسخ نامعتبر"
-                : $"Server={health.Status} | PostgreSQL={health.Database} | {health.UtcTime:HH:mm:ss}";
+            await operation();
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        catch (HttpRequestException)
         {
-            StatusText.Text = "Server در دسترس نیست";
+            status.Text = "ارتباط با Server برقرار نشد.";
+        }
+        catch (TaskCanceledException)
+        {
+            status.Text = "درخواست منقضی شد.";
+        }
+        catch (Exception exception)
+        {
+            status.Text = exception.Message;
+        }
+        finally
+        {
+            button.IsEnabled = true;
         }
     }
 }
