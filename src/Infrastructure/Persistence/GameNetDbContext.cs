@@ -45,7 +45,6 @@ public sealed class GameNetDbContext(DbContextOptions<GameNetDbContext> options)
             entity.Property(x => x.Name).HasMaxLength(128).IsRequired();
             entity.Property(x => x.Type).HasConversion<string>().HasMaxLength(32).IsRequired();
             entity.Property(x => x.Lifecycle).HasConversion<string>().HasMaxLength(32).IsRequired();
-            entity.HasIndex(x => x.AgentDeviceId).IsUnique();
         });
 
         modelBuilder.Entity<AgentDevice>(entity =>
