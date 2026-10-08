@@ -7,6 +7,7 @@ using GameNet.Infrastructure.Foundation;
 using GameNet.Infrastructure.Persistence;
 using GameNet.Infrastructure.Security;
 using GameNet.Server.Bootstrap;
+using GameNet.Server.Background;
 using GameNet.Server.Endpoints;
 using GameNet.Server.Transport;
 using Microsoft.EntityFrameworkCore;
