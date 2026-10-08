@@ -1,5 +1,6 @@
 using GameNet.Application.Identity;
 using GameNet.Application.Stations;
+using GameNet.Application.Foundation;
 using GameNet.Contracts.Stations;
 using GameNet.Domain.Identity;
 using GameNet.Domain.Stations;
@@ -20,6 +21,7 @@ public static class StationEndpoints
         HttpContext context,
         OperatorAuthService auth,
         StationService stations,
+        IGameNetStore store,
         CancellationToken cancellationToken)
     {
         var required = await OperatorAuthorization.RequireAsync(
@@ -34,15 +36,25 @@ public static class StationEndpoints
         }
 
         var result = await stations.ListAsync(cancellationToken);
+        var response = new List<StationDto>(result.Count);
 
-        return Results.Ok(result.Select(station => new StationDto(
-            station.Id,
-            station.Number,
-            station.Name,
-            station.Type.ToString(),
-            station.Lifecycle.ToString(),
-            "Offline",
-            null)));
+        foreach (var station in result)
+        {
+            var agent = await store.FindAgentByStationIdAsync(
+                station.Id,
+                cancellationToken);
+
+            response.Add(new StationDto(
+                station.Id,
+                station.Number,
+                station.Name,
+                station.Type.ToString(),
+                station.Lifecycle.ToString(),
+                agent?.State.ToString() ?? "Unassigned",
+                agent?.LastSeenAt));
+        }
+
+        return Results.Ok(response);
     }
 
     private static async Task<IResult> CreateAsync(
@@ -87,7 +99,7 @@ public static class StationEndpoints
                     station.Name,
                     station.Type.ToString(),
                     station.Lifecycle.ToString(),
-                    "Offline",
+                    "Unassigned",
                     null));
         }
         catch (InvalidOperationException ex)
