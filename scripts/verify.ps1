@@ -17,6 +17,12 @@ function Invoke-Checked {
 }
 
 Invoke-Checked -FilePath "dotnet" -ArgumentList @("--version")
+
+& "$PSScriptRoot/check-source-size.ps1"
+if ($LASTEXITCODE -ne 0) {
+    throw "Source-size architecture guard failed with exit code $LASTEXITCODE."
+}
+
 Invoke-Checked -FilePath "dotnet" -ArgumentList @("restore", "GameNet.slnx")
 Invoke-Checked -FilePath "dotnet" -ArgumentList @("build", "GameNet.slnx", "--configuration", "Release", "--no-restore")
 Invoke-Checked -FilePath "dotnet" -ArgumentList @("test", "GameNet.slnx", "--configuration", "Release", "--no-build", "--no-restore")
