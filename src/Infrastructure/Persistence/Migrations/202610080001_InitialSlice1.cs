@@ -8,8 +8,7 @@ public partial class InitialSlice1 : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.EnsureSchema(
-            name: "gamenet");
+        migrationBuilder.EnsureSchema(name: "gamenet");
 
         migrationBuilder.CreateTable(
             name: "Operators",
@@ -24,10 +23,7 @@ public partial class InitialSlice1 : Migration
                 IsActive = table.Column<bool>(type: "boolean", nullable: false),
                 CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_Operators", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_Operators", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "Stations",
@@ -41,10 +37,7 @@ public partial class InitialSlice1 : Migration
                 Lifecycle = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                 CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_Stations", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_Stations", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AgentDevices",
@@ -62,6 +55,7 @@ public partial class InitialSlice1 : Migration
                 ConnectionId = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                 LeaseVersion = table.Column<long>(type: "bigint", nullable: false),
                 LastSeenAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                Version = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                 CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
             },
             constraints: table =>
@@ -100,78 +94,20 @@ public partial class InitialSlice1 : Migration
                     onDelete: ReferentialAction.Restrict);
             });
 
-        migrationBuilder.CreateIndex(
-            name: "IX_AgentDevices_CredentialHash",
-            schema: "gamenet",
-            table: "AgentDevices",
-            column: "CredentialHash",
-            unique: true);
-
-        migrationBuilder.CreateIndex(
-            name: "IX_AgentDevices_DeviceId",
-            schema: "gamenet",
-            table: "AgentDevices",
-            column: "DeviceId",
-            unique: true);
-
-        migrationBuilder.CreateIndex(
-            name: "IX_AgentDevices_StationId",
-            schema: "gamenet",
-            table: "AgentDevices",
-            column: "StationId",
-            unique: true);
-
-        migrationBuilder.CreateIndex(
-            name: "IX_Operators_UserName",
-            schema: "gamenet",
-            table: "Operators",
-            column: "UserName",
-            unique: true);
-
-        migrationBuilder.CreateIndex(
-            name: "IX_OperatorSessions_OperatorId",
-            schema: "gamenet",
-            table: "OperatorSessions",
-            column: "OperatorId");
-
-        migrationBuilder.CreateIndex(
-            name: "IX_OperatorSessions_TokenHash",
-            schema: "gamenet",
-            table: "OperatorSessions",
-            column: "TokenHash",
-            unique: true);
-
-        migrationBuilder.CreateIndex(
-            name: "IX_Stations_AgentDeviceId",
-            schema: "gamenet",
-            table: "Stations",
-            column: "AgentDeviceId",
-            unique: true);
-        
-        migrationBuilder.CreateIndex(
-            name: "IX_Stations_Number",
-            schema: "gamenet",
-            table: "Stations",
-            column: "Number",
-            unique: true);
+        migrationBuilder.CreateIndex(name: "IX_AgentDevices_CredentialHash", schema: "gamenet", table: "AgentDevices", column: "CredentialHash", unique: true);
+        migrationBuilder.CreateIndex(name: "IX_AgentDevices_DeviceId", schema: "gamenet", table: "AgentDevices", column: "DeviceId", unique: true);
+        migrationBuilder.CreateIndex(name: "IX_AgentDevices_StationId", schema: "gamenet", table: "AgentDevices", column: "StationId", unique: true);
+        migrationBuilder.CreateIndex(name: "IX_Operators_UserName", schema: "gamenet", table: "Operators", column: "UserName", unique: true);
+        migrationBuilder.CreateIndex(name: "IX_OperatorSessions_OperatorId", schema: "gamenet", table: "OperatorSessions", column: "OperatorId");
+        migrationBuilder.CreateIndex(name: "IX_OperatorSessions_TokenHash", schema: "gamenet", table: "OperatorSessions", column: "TokenHash", unique: true);
+        migrationBuilder.CreateIndex(name: "IX_Stations_Number", schema: "gamenet", table: "Stations", column: "Number", unique: true);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.DropTable(
-            name: "OperatorSessions",
-            schema: "gamenet");
-
-        migrationBuilder.DropTable(
-            name: "AgentDevices",
-            schema: "gamenet");
-
-        migrationBuilder.DropTable(
-            name: "Operators",
-            schema: "gamenet");
-
-        migrationBuilder.DropTable(
-            name: "Stations",
-            schema: "gamenet");
+        migrationBuilder.DropTable(name: "OperatorSessions", schema: "gamenet");
+        migrationBuilder.DropTable(name: "AgentDevices", schema: "gamenet");
+        migrationBuilder.DropTable(name: "Operators", schema: "gamenet");
+        migrationBuilder.DropTable(name: "Stations", schema: "gamenet");
     }
 }
