@@ -5,6 +5,11 @@ public sealed record CreateStationRequest(
     string Name,
     string Type);
 
+public sealed record UpdateStationRequest(
+    string Name,
+    string Type,
+    string Lifecycle);
+
 public sealed record StationDto(
     Guid Id,
     int Number,
