@@ -5,7 +5,7 @@ namespace GameNet.Domain.Tests;
 public sealed class StationTests
 {
     [Fact]
-    public void Disabled_Station_Cannot_Bind_Agent()
+    public void Disabled_Station_Cannot_Enter_Maintenance()
     {
         var station = Station.Create(
             1,
@@ -15,12 +15,11 @@ public sealed class StationTests
 
         station.Disable();
 
-        Assert.Throws<InvalidOperationException>(() =>
-            station.BindAgent(Guid.NewGuid()));
+        Assert.Throws<InvalidOperationException>(station.EnterMaintenance);
     }
 
     [Fact]
-    public void Bound_Station_Cannot_Be_Disabled()
+    public void Enabled_Station_Can_Enter_And_Exit_Maintenance()
     {
         var station = Station.Create(
             1,
@@ -28,8 +27,12 @@ public sealed class StationTests
             StationType.Pc,
             DateTimeOffset.UtcNow);
 
-        station.BindAgent(Guid.NewGuid());
+        station.EnterMaintenance();
 
-        Assert.Throws<InvalidOperationException>(station.Disable);
+        Assert.Equal(StationLifecycle.Maintenance, station.Lifecycle);
+
+        station.Enable();
+
+        Assert.Equal(StationLifecycle.Enabled, station.Lifecycle);
     }
 }
