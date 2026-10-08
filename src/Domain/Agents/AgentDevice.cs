@@ -4,14 +4,12 @@ public sealed class AgentDevice
 {
     private AgentDevice() { }
 
-    private AgentDevice(
-        Guid id,
-        string deviceId,
-        DateTimeOffset createdAt)
+    private AgentDevice(Guid id, string deviceId, DateTimeOffset createdAt)
     {
         Id = id;
         DeviceId = deviceId;
         State = AgentState.Registered;
+        Version = Guid.NewGuid();
         CreatedAt = createdAt;
     }
 
@@ -26,6 +24,7 @@ public sealed class AgentDevice
     public string? ConnectionId { get; private set; }
     public long LeaseVersion { get; private set; }
     public DateTimeOffset? LastSeenAt { get; private set; }
+    public Guid Version { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
 
     public static AgentDevice Register(string deviceId, DateTimeOffset createdAt)
@@ -45,6 +44,7 @@ public sealed class AgentDevice
         PairingCodeHash = codeHash;
         PairingExpiresAt = expiresAt;
         State = AgentState.Registered;
+        Touch();
     }
 
     public bool CanPair(string codeHash, DateTimeOffset now) =>
@@ -65,6 +65,7 @@ public sealed class AgentDevice
         State = AgentState.Paired;
         ConnectionId = null;
         LeaseVersion = 0;
+        Touch();
     }
 
     public long OpenLease(string connectionId, DateTimeOffset now)
@@ -85,6 +86,7 @@ public sealed class AgentDevice
         ConnectionId = connectionId;
         State = AgentState.Online;
         LastSeenAt = now;
+        Touch();
         return LeaseVersion;
     }
 
@@ -99,6 +101,7 @@ public sealed class AgentDevice
 
         LastSeenAt = now;
         State = AgentState.Online;
+        Touch();
         return true;
     }
 
@@ -114,6 +117,7 @@ public sealed class AgentDevice
             State = AgentState.Stale;
             ConnectionId = null;
             LastSeenAt = now;
+            Touch();
         }
     }
 
@@ -124,6 +128,7 @@ public sealed class AgentDevice
             ConnectionId = null;
             State = AgentState.Stale;
             LastSeenAt = now;
+            Touch();
         }
     }
 
@@ -135,6 +140,7 @@ public sealed class AgentDevice
         }
 
         StationId = stationId;
+        Touch();
     }
 
     public void UnbindStation(Guid stationId)
@@ -142,6 +148,7 @@ public sealed class AgentDevice
         if (StationId == stationId)
         {
             StationId = null;
+            Touch();
         }
     }
 
@@ -149,5 +156,8 @@ public sealed class AgentDevice
     {
         State = AgentState.Disabled;
         ConnectionId = null;
+        Touch();
     }
+
+    private void Touch() => Version = Guid.NewGuid();
 }
