@@ -2,125 +2,275 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="GameNet Manager 4"
-        Width="1180"
-        Height="720"
-        MinWidth="1000"
-        MinHeight="620"
+        Width="1280"
+        Height="760"
+        MinWidth="1080"
+        MinHeight="660"
         WindowStartupLocation="CenterScreen"
-        FlowDirection="RightToLeft">
+        FlowDirection="RightToLeft"
+        Background="#F7F8FA">
     <Grid Margin="24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0" Margin="0,0,0,18">
-            <TextBlock x:Name="OperatorText"
-                       Text="GameNet Manager 4"
-                       FontSize="28"
-                       FontWeight="SemiBold"
-                       DockPanel.Dock="Right" />
+            <StackPanel DockPanel.Dock="Right">
+                <TextBlock x:Name="OperatorText"
+                           Text="GameNet Manager 4"
+                           FontSize="28"
+                           FontWeight="SemiBold"/>
+                <TextBlock x:Name="ConnectionText"
+                           Margin="0,4,0,0"
+                           Text="در انتظار ورود"
+                           Opacity="0.65"/>
+            </StackPanel>
             <TextBlock Text="کنترل‌سنتر"
-                       Margin="18,8,0,0"
-                       FontSize="16" />
+                       Margin="24,8,0,0"
+                       FontSize="17"
+                       VerticalAlignment="Top"/>
         </DockPanel>
 
         <Border Grid.Row="1"
+                Background="White"
                 Padding="20"
-                BorderBrush="#D0D4DC"
+                BorderBrush="#E1E5EB"
                 BorderThickness="1"
-                CornerRadius="8">
+                CornerRadius="12">
             <Grid>
                 <Grid x:Name="LoginPanel">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Text="ورود اپراتور"
                                FontSize="24"
-                               FontWeight="SemiBold" />
-
+                               FontWeight="SemiBold"/>
                     <TextBlock Grid.Row="1"
                                Text="نام کاربری"
-                               Margin="0,22,0,6" />
+                               Margin="0,28,0,6"/>
                     <TextBox x:Name="UserNameBox"
                              Grid.Row="1"
-                             Margin="110,18,0,0"
-                             Height="34"
-                             MaxWidth="360" />
-
+                             Margin="110,22,0,0"
+                             Height="36"
+                             MaxWidth="380"/>
                     <TextBlock Grid.Row="2"
                                Text="رمز عبور"
-                               Margin="0,18,0,6" />
+                               Margin="0,20,0,6"/>
                     <PasswordBox x:Name="PasswordBox"
                                  Grid.Row="2"
-                                 Margin="110,14,0,0"
-                                 Height="34"
-                                 MaxWidth="360" />
-
-                    <StackPanel Grid.Row="3"
-                                Margin="0,24,0,0">
+                                 Margin="110,16,0,0"
+                                 Height="36"
+                                 MaxWidth="380"/>
+                    <StackPanel Grid.Row="3" Margin="0,28,0,0">
                         <Button x:Name="LoginButton"
-                                Content="ورود"
-                                Width="120"
-                                Height="38"
+                                Content="ورود به کنترل‌سنتر"
+                                Width="160"
+                                Height="40"
                                 HorizontalAlignment="Left"
-                                Click="Login_Click" />
+                                Click="Login_Click"/>
                         <TextBlock x:Name="LoginStatus"
                                    Margin="0,12,0,0"
-                                   TextWrapping="Wrap" />
+                                   TextWrapping="Wrap"/>
                     </StackPanel>
                 </Grid>
 
-                <Grid x:Name="DashboardPanel"
-                      Visibility="Collapsed">
+                <Grid x:Name="DashboardPanel" Visibility="Collapsed">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <DockPanel Grid.Row="0"
-                               Margin="0,0,0,14">
-                        <Button Content="به‌روزرسانی"
-                                Width="110"
-                                Height="34"
-                                DockPanel.Dock="Left"
-                                Click="RefreshStations_Click" />
-                        <TextBlock Text="ایستگاه‌ها"
-                                   FontSize="22"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center" />
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Margin="0,0,8,0" Padding="16"
+                                Background="#F3F5F8" CornerRadius="10">
+                            <StackPanel>
+                                <TextBlock Text="کل ایستگاه‌ها" Opacity="0.7"/>
+                                <TextBlock x:Name="TotalStationsText" Margin="0,8,0,0"
+                                           FontSize="28" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Margin="8,0" Padding="16"
+                                Background="#EEF8F0" CornerRadius="10">
+                            <StackPanel>
+                                <TextBlock Text="فعال" Opacity="0.7"/>
+                                <TextBlock x:Name="EnabledStationsText" Margin="0,8,0,0"
+                                           FontSize="28" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Margin="8,0" Padding="16"
+                                Background="#FFF7E8" CornerRadius="10">
+                            <StackPanel>
+                                <TextBlock Text="تعمیرات" Opacity="0.7"/>
+                                <TextBlock x:Name="MaintenanceStationsText" Margin="0,8,0,0"
+                                           FontSize="28" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="3" Margin="8,0,0,0" Padding="16"
+                                Background="#EEF3FF" CornerRadius="10">
+                            <StackPanel>
+                                <TextBlock Text="Agent متصل" Opacity="0.7"/>
+                                <TextBlock x:Name="OnlineAgentsText" Margin="0,8,0,0"
+                                           FontSize="28" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <DockPanel Grid.Row="1" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Button Content="ایستگاه جدید"
+                                    Width="115"
+                                    Height="36"
+                                    Click="NewStation_Click"/>
+                            <Button Content="بازخوانی"
+                                    Margin="8,0,0,0"
+                                    Width="100"
+                                    Height="36"
+                                    Click="RefreshStations_Click"/>
+                        </StackPanel>
+                        <TextBox x:Name="SearchBox"
+                                 Width="260"
+                                 Height="36"
+                                 Margin="0,0,12,0"
+                                 HorizontalAlignment="Right"
+                                 VerticalContentAlignment="Center"
+                                 TextChanged="SearchBox_TextChanged"/>
                     </DockPanel>
 
-                    <ListView Grid.Row="1"
-                              ItemsSource="{Binding Stations}">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="شماره"
-                                                DisplayMemberBinding="{Binding Number}"
-                                                Width="70" />
-                                <GridViewColumn Header="نام"
-                                                DisplayMemberBinding="{Binding Name}"
-                                                Width="220" />
-                                <GridViewColumn Header="نوع"
-                                                DisplayMemberBinding="{Binding Type}"
-                                                Width="150" />
-                                <GridViewColumn Header="وضعیت"
-                                                DisplayMemberBinding="{Binding Lifecycle}"
-                                                Width="150" />
-                                <GridViewColumn Header="Agent"
-                                                DisplayMemberBinding="{Binding AgentState}"
-                                                Width="150" />
-                                <GridViewColumn Header="آخرین مشاهده"
-                                                DisplayMemberBinding="{Binding LastSeenAt}"
-                                                Width="220" />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+                    <Grid Grid.Row="2" x:Name="EditorPanel"
+                          Visibility="Collapsed"
+                          Margin="0,0,0,12"
+                          Background="#F8FAFC">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="260"/>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="260"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="شماره"
+                                   VerticalAlignment="Center" Margin="12,0"/>
+                        <TextBox x:Name="StationNumberBox" Grid.Column="1"
+                                 Height="34" Margin="0,0,12,0"/>
+                        <TextBlock Grid.Column="2" Text="نام"
+                                   VerticalAlignment="Center"/>
+                        <TextBox x:Name="StationNameBox" Grid.Column="3"
+                                 Height="34" Margin="0,0,12,0"/>
+                        <StackPanel Grid.Column="4" Orientation="Horizontal"
+                                    HorizontalAlignment="Left">
+                            <Button x:Name="SaveStationButton"
+                                    Content="ذخیره"
+                                    Width="90" Height="34"
+                                    Click="SaveStation_Click"/>
+                            <Button Content="لغو"
+                                    Margin="8,0,0,0"
+                                    Width="80" Height="34"
+                                    Click="CancelEditor_Click"/>
+                            <Button x:Name="DeleteStationButton"
+                                    Content="غیرفعال‌سازی"
+                                    Margin="8,0,0,0"
+                                    Width="110" Height="34"
+                                    Click="DeleteStation_Click"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="250"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ScrollViewer Grid.Column="0"
+                                      VerticalScrollBarVisibility="Auto">
+                            <ItemsControl x:Name="StationCards">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="245" Height="145"
+                                                Margin="0,0,12,12"
+                                                Padding="14"
+                                                CornerRadius="10"
+                                                BorderBrush="#DCE1E8"
+                                                BorderThickness="1"
+                                                Background="White"
+                                                MouseLeftButtonUp="StationCard_Click">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <DockPanel>
+                                                    <TextBlock Text="{Binding Number, StringFormat=ایستگاه {0}}"
+                                                               FontWeight="Bold"
+                                                               FontSize="18"/>
+                                                    <TextBlock DockPanel.Dock="Left"
+                                                               Text="{Binding Type}"
+                                                               Opacity="0.6"/>
+                                                </DockPanel>
+                                                <TextBlock Grid.Row="1"
+                                                           Margin="0,8,0,0"
+                                                           Text="{Binding Name}"
+                                                           FontSize="15"/>
+                                                <TextBlock Grid.Row="2"
+                                                           Margin="0,8,0,0"
+                                                           Text="{Binding Lifecycle}"
+                                                           Opacity="0.8"/>
+                                                <DockPanel Grid.Row="3">
+                                                    <TextBlock Text="{Binding AgentState}"
+                                                               FontWeight="SemiBold"/>
+                                                    <TextBlock DockPanel.Dock="Left"
+                                                               Text="{Binding LastSeenAt, StringFormat={}{0:HH:mm:ss}}"
+                                                               Opacity="0.5"/>
+                                                </DockPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <Border Grid.Column="1"
+                                Margin="12,0,0,0"
+                                Padding="16"
+                                Background="#F8FAFC"
+                                CornerRadius="10">
+                            <StackPanel>
+                                <TextBlock Text="وضعیت انتخاب‌شده"
+                                           FontWeight="SemiBold"
+                                           FontSize="17"/>
+                                <TextBlock x:Name="SelectedStationText"
+                                           Margin="0,14,0,0"
+                                           TextWrapping="Wrap"/>
+                                <Separator Margin="0,14"/>
+                                <TextBlock Text="راهنما"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Margin="0,8,0,0"
+                                           Text="برای تغییر مشخصات یا وضعیت، روی کارت ایستگاه کلیک کنید."
+                                           TextWrapping="Wrap"
+                                           Opacity="0.7"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </Grid>
             </Grid>
         </Border>
@@ -128,6 +278,7 @@
         <TextBlock Grid.Row="2"
                    Margin="0,12,0,0"
                    Text="Server authoritative • PostgreSQL • بدون داده ساختگی"
-                   FontSize="12" />
+                   FontSize="12"
+                   Opacity="0.65"/>
     </Grid>
 </Window>
