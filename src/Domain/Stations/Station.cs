@@ -50,6 +50,18 @@ public sealed class Station
             createdAt);
     }
 
+    public void Rename(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Station name is required.", nameof(name));
+        }
+
+        Name = name.Trim();
+    }
+
+    public void ChangeType(StationType type) => Type = type;
+
     public void EnterMaintenance()
     {
         if (Lifecycle == StationLifecycle.Disabled)
