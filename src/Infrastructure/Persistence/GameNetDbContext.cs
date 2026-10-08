@@ -58,6 +58,7 @@ public sealed class GameNetDbContext(DbContextOptions<GameNetDbContext> options)
             entity.Property(x => x.PairingCodeHash).HasMaxLength(128);
             entity.Property(x => x.ConnectionId).HasMaxLength(256);
             entity.Property(x => x.State).HasConversion<string>().HasMaxLength(32).IsRequired();
+            entity.Property(x => x.Version).IsConcurrencyToken().IsRequired();
             entity.HasIndex(x => x.StationId).IsUnique();
             entity.HasOne<Station>()
                 .WithMany()
