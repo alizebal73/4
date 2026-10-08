@@ -46,9 +46,7 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
 
     public async Task<IReadOnlyList<Station>> ListStationsAsync(
         CancellationToken cancellationToken) =>
-        await db.Stations
-            .OrderBy(x => x.Number)
-            .ToListAsync(cancellationToken);
+        await db.Stations.OrderBy(x => x.Number).ToListAsync(cancellationToken);
 
     public Task<bool> StationNumberExistsAsync(
         int number,
@@ -58,9 +56,7 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
     public Task<Station?> GetStationAsync(
         Guid stationId,
         CancellationToken cancellationToken) =>
-        db.Stations.SingleOrDefaultAsync(
-            x => x.Id == stationId,
-            cancellationToken);
+        db.Stations.SingleOrDefaultAsync(x => x.Id == stationId, cancellationToken);
 
     public Task AddStationAsync(
         Station station,
@@ -70,30 +66,22 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
     public Task<AgentDevice?> GetAgentAsync(
         Guid agentId,
         CancellationToken cancellationToken) =>
-        db.AgentDevices.SingleOrDefaultAsync(
-            x => x.Id == agentId,
-            cancellationToken);
+        db.AgentDevices.SingleOrDefaultAsync(x => x.Id == agentId, cancellationToken);
 
     public Task<AgentDevice?> FindAgentByDeviceIdAsync(
         string deviceId,
         CancellationToken cancellationToken) =>
-        db.AgentDevices.SingleOrDefaultAsync(
-            x => x.DeviceId == deviceId,
-            cancellationToken);
+        db.AgentDevices.SingleOrDefaultAsync(x => x.DeviceId == deviceId, cancellationToken);
 
     public Task<AgentDevice?> FindAgentByCredentialHashAsync(
         string credentialHash,
         CancellationToken cancellationToken) =>
-        db.AgentDevices.SingleOrDefaultAsync(
-            x => x.CredentialHash == credentialHash,
-            cancellationToken);
+        db.AgentDevices.SingleOrDefaultAsync(x => x.CredentialHash == credentialHash, cancellationToken);
 
     public Task<AgentDevice?> FindAgentByStationIdAsync(
         Guid stationId,
         CancellationToken cancellationToken) =>
-        db.AgentDevices.SingleOrDefaultAsync(
-            x => x.StationId == stationId,
-            cancellationToken);
+        db.AgentDevices.SingleOrDefaultAsync(x => x.StationId == stationId, cancellationToken);
 
     public Task AddAgentAsync(
         AgentDevice agent,
@@ -102,71 +90,75 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
 
     public async Task<IReadOnlyList<AgentDevice>> ListAgentsAsync(
         CancellationToken cancellationToken) =>
-        await db.AgentDevices
-            .OrderBy(x => x.DeviceId)
-            .ToListAsync(cancellationToken);
+        await db.AgentDevices.OrderBy(x => x.DeviceId).ToListAsync(cancellationToken);
 
     public async Task<bool> BindAgentToStationAsync(
         Guid agentId,
         Guid stationId,
         CancellationToken cancellationToken)
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(
-            System.Data.IsolationLevel.Serializable,
-            cancellationToken);
-
-        var agent = await db.AgentDevices.SingleOrDefaultAsync(
-            x => x.Id == agentId,
-            cancellationToken);
-        var station = await db.Stations.SingleOrDefaultAsync(
-            x => x.Id == stationId,
-            cancellationToken);
-
-        if (agent is null || station is null)
+        for (var attempt = 1; attempt <= 3; attempt++)
         {
-            return false;
-        }
-
-        if (agent.StationId is not null && agent.StationId != stationId)
-        {
-            return false;
-        }
-
-        if (station.Lifecycle is StationLifecycle.Disabled)
-        {
-            return false;
-        }
-
-        var occupiedByAnother = await db.AgentDevices
-            .AnyAsync(
-                x => x.StationId == stationId && x.Id != agentId,
+            await using var transaction = await db.Database.BeginTransactionAsync(
+                System.Data.IsolationLevel.Serializable,
                 cancellationToken);
 
-        if (occupiedByAnother)
-        {
-            return false;
+            try
+            {
+                var agent = await db.AgentDevices.SingleOrDefaultAsync(
+                    x => x.Id == agentId,
+                    cancellationToken);
+                var station = await db.Stations.SingleOrDefaultAsync(
+                    x => x.Id == stationId,
+                    cancellationToken);
+
+                if (agent is null || station is null ||
+                    (agent.StationId is not null && agent.StationId != stationId) ||
+                    station.Lifecycle is StationLifecycle.Disabled)
+                {
+                    return false;
+                }
+
+                var occupiedByAnother = await db.AgentDevices.AnyAsync(
+                    x => x.StationId == stationId && x.Id != agentId,
+                    cancellationToken);
+
+                if (occupiedByAnother)
+                {
+                    return false;
+                }
+
+                agent.BindStation(station.Id);
+                await db.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+                return true;
+            }
+            catch (PostgresException exception) when (
+                exception.SqlState is PostgresErrorCodes.SerializationFailure or
+                PostgresErrorCodes.DeadlockDetected)
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
+                if (attempt == 3)
+                {
+                    return false;
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
+                if (attempt == 3)
+                {
+                    return false;
+                }
+            }
+            catch (DbUpdateException)
+            {
+                await transaction.RollbackAsync(CancellationToken.None);
+                return false;
+            }
         }
 
-        try
-        {
-            agent.BindStation(station.Id);
-
-            await db.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-            return true;
-        }
-        catch (DbUpdateException)
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            return false;
-        }
-        catch (PostgresException exception) when (
-            exception.SqlState is PostgresErrorCodes.SerializationFailure or
-            PostgresErrorCodes.DeadlockDetected)
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            return false;
-        }
+        return false;
     }
 
     public async Task<bool> UnbindAgentFromStationAsync(
@@ -195,6 +187,15 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
         return true;
     }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken) =>
-        db.SaveChangesAsync(cancellationToken);
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            throw new ConcurrencyConflictException();
+        }
+    }
 }
