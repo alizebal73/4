@@ -1,4 +1,5 @@
 using GameNet.Application.Agents;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace GameNet.Server.Transport;
 
@@ -36,9 +37,8 @@ public sealed class AgentHub : Microsoft.AspNetCore.SignalR.Hub
 
     private string? GetAccessToken()
     {
-        var httpContext = Context.GetHttpContext();
-        var token = httpContext?.Request.Headers.Authorization
-            .ToString();
+        var httpContext = Context.Features.Get<IHttpContextFeature>()?.HttpContext;
+        var token = httpContext?.Request.Headers.Authorization.ToString();
 
         if (token?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
         {
@@ -58,7 +58,7 @@ public sealed class AgentHub : Microsoft.AspNetCore.SignalR.Hub
 
     private async Task DisconnectAsync()
     {
-        var httpContext = Context.GetHttpContext();
+        var httpContext = Context.Features.Get<IHttpContextFeature>()?.HttpContext;
         var token = GetAccessToken();
 
         if (httpContext is null || token is null)
