@@ -25,7 +25,6 @@ public sealed class Station
     public StationType Type { get; private set; }
     public StationLifecycle Lifecycle { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
-    public Guid? AgentDeviceId { get; private set; }
 
     public static Station Create(
         int number,
@@ -63,36 +62,5 @@ public sealed class Station
 
     public void Enable() => Lifecycle = StationLifecycle.Enabled;
 
-    public void Disable()
-    {
-        if (AgentDeviceId is not null)
-        {
-            throw new InvalidOperationException("An agent-bound station cannot be disabled.");
-        }
-
-        Lifecycle = StationLifecycle.Disabled;
-    }
-
-    public void BindAgent(Guid agentDeviceId)
-    {
-        if (Lifecycle == StationLifecycle.Disabled)
-        {
-            throw new InvalidOperationException("Disabled stations cannot bind an agent.");
-        }
-
-        if (AgentDeviceId is not null && AgentDeviceId != agentDeviceId)
-        {
-            throw new InvalidOperationException("The station is already bound to another agent.");
-        }
-
-        AgentDeviceId = agentDeviceId;
-    }
-
-    public void UnbindAgent(Guid agentDeviceId)
-    {
-        if (AgentDeviceId == agentDeviceId)
-        {
-            AgentDeviceId = null;
-        }
-    }
+    public void Disable() => Lifecycle = StationLifecycle.Disabled;
 }
