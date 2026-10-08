@@ -34,3 +34,21 @@ public sealed class AgentDeviceTests
         Assert.True(agent.CanPair("hash", created.AddSeconds(30)));
     }
 }
+
+    [Fact]
+    public void Online_Agent_Becomes_Stale_After_Heartbeat_Timeout()
+    {
+        var created = DateTimeOffset.Parse("2026-10-08T00:00:00Z");
+        var agent = AgentDevice.Register("PC-03", created);
+
+        agent.CompletePairing("PC 03", "credential");
+        agent.OpenLease("connection-a", created);
+
+        Assert.True(agent.ShouldBecomeStale(created.AddSeconds(31), TimeSpan.FromSeconds(30)));
+
+        agent.MarkStale(created.AddSeconds(31));
+
+        Assert.Equal(AgentState.Stale, agent.State);
+        Assert.Null(agent.ConnectionId);
+        Assert.False(agent.Heartbeat("connection-a", 1, created.AddSeconds(32)));
+    }
