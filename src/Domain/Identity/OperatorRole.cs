@@ -22,7 +22,7 @@ public static class RolePermissions
         role switch
         {
             OperatorRole.Owner => true,
-            OperatorRole.Manager => permission is not Permission.AgentManage,
+            OperatorRole.Manager => true,
             OperatorRole.Operator => permission is Permission.DashboardRead or Permission.StationRead or Permission.AgentRead,
             _ => false
         };
