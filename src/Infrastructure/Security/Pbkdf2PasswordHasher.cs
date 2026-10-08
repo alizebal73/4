@@ -23,7 +23,9 @@ public sealed class Pbkdf2PasswordHasher : IPasswordHasher
             HashAlgorithmName.SHA256,
             KeySize);
 
-        return $"v1$\{Iterations}$\{Convert.ToBase64String(salt)}$\{Convert.ToBase64String(key)}";
+        return "v1$" + Iterations + "$" +
+               Convert.ToBase64String(salt) + "$" +
+               Convert.ToBase64String(key);
     }
 
     public bool Verify(string password, string passwordHash)
@@ -37,7 +39,8 @@ public sealed class Pbkdf2PasswordHasher : IPasswordHasher
         var parts = passwordHash.Split('$');
         if (parts.Length != 4 ||
             parts[0] != "v1" ||
-            !int.TryParse(parts[1], out var iterations))
+            !int.TryParse(parts[1], out var iterations) ||
+            iterations < 100_000)
         {
             return false;
         }
@@ -46,6 +49,12 @@ public sealed class Pbkdf2PasswordHasher : IPasswordHasher
         {
             var salt = Convert.FromBase64String(parts[2]);
             var expected = Convert.FromBase64String(parts[3]);
+
+            if (salt.Length != SaltSize || expected.Length != KeySize)
+            {
+                return false;
+            }
+
             var actual = Rfc2898DeriveBytes.Pbkdf2(
                 password,
                 salt,
