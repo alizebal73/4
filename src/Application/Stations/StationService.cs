@@ -28,4 +28,56 @@ public sealed class StationService(
     public Task<IReadOnlyList<Station>> ListAsync(
         CancellationToken cancellationToken) =>
         store.ListStationsAsync(cancellationToken);
+
+    public async Task<Station?> UpdateAsync(
+        Guid stationId,
+        string name,
+        StationType type,
+        StationLifecycle lifecycle,
+        CancellationToken cancellationToken)
+    {
+        var station = await store.GetStationAsync(stationId, cancellationToken);
+
+        if (station is null)
+        {
+            return null;
+        }
+
+        station.Rename(name);
+        station.ChangeType(type);
+
+        switch (lifecycle)
+        {
+            case StationLifecycle.Enabled:
+                station.Enable();
+                break;
+            case StationLifecycle.Maintenance:
+                station.EnterMaintenance();
+                break;
+            case StationLifecycle.Disabled:
+                station.Disable();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(lifecycle));
+        }
+
+        await store.SaveChangesAsync(cancellationToken);
+        return station;
+    }
+
+    public async Task<bool> DisableAsync(
+        Guid stationId,
+        CancellationToken cancellationToken)
+    {
+        var station = await store.GetStationAsync(stationId, cancellationToken);
+
+        if (station is null)
+        {
+            return false;
+        }
+
+        station.Disable();
+        await store.SaveChangesAsync(cancellationToken);
+        return true;
+    }
 }
