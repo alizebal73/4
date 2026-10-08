@@ -1,5 +1,14 @@
 namespace GameNet.Contracts.Agents;
 
+public sealed record AgentDto(
+    Guid Id,
+    string DeviceId,
+    string DisplayName,
+    string State,
+    Guid? StationId,
+    long LeaseVersion,
+    DateTimeOffset? LastSeenAt);
+
 public sealed record CreatePairingCodeRequest(string DeviceId);
 
 public sealed record CreatePairingCodeResponse(
