@@ -50,10 +50,10 @@ public sealed class AgentHub : Microsoft.AspNetCore.SignalR.Hub
         return string.IsNullOrWhiteSpace(queryToken) ? null : queryToken;
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _ = DisconnectAsync();
-        return base.OnDisconnectedAsync(exception);
+        await DisconnectAsync();
+        await base.OnDisconnectedAsync(exception);
     }
 
     private async Task DisconnectAsync()
