@@ -3,6 +3,7 @@ using GameNet.Domain.Agents;
 using GameNet.Domain.Identity;
 using GameNet.Domain.Stations;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace GameNet.Infrastructure.Persistence;
 
@@ -124,7 +125,7 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
             return false;
         }
 
-        if (station.Lifecycle is Domain.Stations.StationLifecycle.Disabled)
+        if (station.Lifecycle is StationLifecycle.Disabled)
         {
             return false;
         }
@@ -147,7 +148,14 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
             await transaction.CommitAsync(cancellationToken);
             return true;
         }
-        catch (Exception) when (transaction.GetDbTransaction().Connection is not null)
+        catch (DbUpdateException)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return false;
+        }
+        catch (PostgresException exception) when (
+            exception.SqlState is PostgresErrorCodes.SerializationFailure or
+            PostgresErrorCodes.DeadlockDetected)
         {
             await transaction.RollbackAsync(cancellationToken);
             return false;
