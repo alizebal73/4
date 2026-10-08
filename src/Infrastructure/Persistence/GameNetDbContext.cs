@@ -54,9 +54,9 @@ public sealed class GameNetDbContext(DbContextOptions<GameNetDbContext> options)
             entity.Property(x => x.DeviceId).HasMaxLength(128).IsRequired();
             entity.HasIndex(x => x.DeviceId).IsUnique();
             entity.Property(x => x.DisplayName).HasMaxLength(128).IsRequired();
-            entity.Property(x => x.CredentialHash).HasMaxLength(128).IsRequired();
+            entity.Property(x => x.CredentialHash).HasMaxLength(128);
             entity.HasIndex(x => x.CredentialHash).IsUnique();
-            entity.Property(x => x.PairingCodeHash).HasMaxLength(128).IsRequired();
+            entity.Property(x => x.PairingCodeHash).HasMaxLength(128);
             entity.Property(x => x.ConnectionId).HasMaxLength(256);
             entity.Property(x => x.State).HasConversion<string>().HasMaxLength(32).IsRequired();
             entity.HasIndex(x => x.StationId).IsUnique();
