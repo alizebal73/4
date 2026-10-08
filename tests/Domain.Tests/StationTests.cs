@@ -1,3 +1,5 @@
+using Xunit;
+
 using GameNet.Domain.Stations;
 
 namespace GameNet.Domain.Tests;
