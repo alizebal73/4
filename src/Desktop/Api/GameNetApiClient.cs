@@ -19,6 +19,8 @@ public sealed class GameNetApiClient
 
     private string? _accessToken;
 
+    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(_accessToken);
+
     public async Task<LoginResponse?> LoginAsync(
         string userName,
         string password,
@@ -51,21 +53,92 @@ public sealed class GameNetApiClient
     public async Task<IReadOnlyList<StationDto>> GetStationsAsync(
         CancellationToken cancellationToken)
     {
-        EnsureAuthenticated();
-
-        using var request = new HttpRequestMessage(
+        var response = await SendAuthenticatedAsync(
             HttpMethod.Get,
-            "api/stations");
-
-        request.Headers.Authorization =
-            new AuthenticationHeaderValue("Bearer", _accessToken);
-
-        var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
+            "api/stations",
+            cancellationToken);
 
         return await response.Content.ReadFromJsonAsync<List<StationDto>>(
                    cancellationToken: cancellationToken)
                ?? [];
+    }
+
+    public async Task<StationDto> CreateStationAsync(
+        CreateStationRequest request,
+        CancellationToken cancellationToken)
+    {
+        using var message = CreateAuthenticatedRequest(
+            HttpMethod.Post,
+            "api/stations");
+
+        message.Content = JsonContent.Create(request);
+
+        var response = await _httpClient.SendAsync(message, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<StationDto>(
+                   cancellationToken: cancellationToken)
+               ?? throw new InvalidOperationException("Server returned an empty station.");
+    }
+
+    public async Task<StationDto> UpdateStationAsync(
+        Guid stationId,
+        UpdateStationRequest request,
+        CancellationToken cancellationToken)
+    {
+        using var message = CreateAuthenticatedRequest(
+            HttpMethod.Put,
+            $"api/stations/{stationId}");
+
+        message.Content = JsonContent.Create(request);
+
+        var response = await _httpClient.SendAsync(message, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<StationDto>(
+                   cancellationToken: cancellationToken)
+               ?? throw new InvalidOperationException("Server returned an empty station.");
+    }
+
+    public async Task DeleteStationAsync(
+        Guid stationId,
+        CancellationToken cancellationToken)
+    {
+        using var message = CreateAuthenticatedRequest(
+            HttpMethod.Delete,
+            $"api/stations/{stationId}");
+
+        var response = await _httpClient.SendAsync(message, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
+
+    private async Task<HttpResponseMessage> SendAuthenticatedAsync(
+        HttpMethod method,
+        string path,
+        CancellationToken cancellationToken)
+    {
+        using var request = CreateAuthenticatedRequest(method, path);
+        var response = await _httpClient.SendAsync(request, cancellationToken);
+
+        if (response.StatusCode is HttpStatusCode.Unauthorized)
+        {
+            throw new UnauthorizedAccessException("Desktop authentication expired.");
+        }
+
+        response.EnsureSuccessStatusCode();
+        return response;
+    }
+
+    private HttpRequestMessage CreateAuthenticatedRequest(
+        HttpMethod method,
+        string path)
+    {
+        EnsureAuthenticated();
+
+        var request = new HttpRequestMessage(method, path);
+        request.Headers.Authorization =
+            new AuthenticationHeaderValue("Bearer", _accessToken);
+        return request;
     }
 
     private void EnsureAuthenticated()
