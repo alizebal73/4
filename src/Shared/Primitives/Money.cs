@@ -1,18 +1,22 @@
 namespace GameNet.Shared.Primitives;
 
-public readonly record struct Money(long Toman)
+public readonly record struct Money
 {
-    public static Money Zero => new(0);
+    public long Toman { get; }
 
-    public static Money FromToman(long amount)
+    public Money(long toman)
     {
-        if (amount < 0)
+        if (toman < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(amount), "Money cannot be negative.");
+            throw new ArgumentOutOfRangeException(nameof(toman), "Money cannot be negative.");
         }
 
-        return new Money(amount);
+        Toman = toman;
     }
+
+    public static Money Zero => new(0);
+
+    public static Money FromToman(long amount) => new(amount);
 
     public static Money operator +(Money left, Money right) =>
         new(checked(left.Toman + right.Toman));
