@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using GameNet.Contracts.Agents;
 using GameNet.Contracts.Identity;
 using GameNet.Contracts.Stations;
 
@@ -107,6 +108,52 @@ public sealed class GameNetApiClient
         using var message = CreateAuthenticatedRequest(
             HttpMethod.Delete,
             $"api/stations/{stationId}");
+
+        var response = await _httpClient.SendAsync(message, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<IReadOnlyList<AgentDto>> GetAgentsAsync(
+        CancellationToken cancellationToken)
+    {
+        var response = await SendAuthenticatedAsync(
+            HttpMethod.Get,
+            "api/agents",
+            cancellationToken);
+
+        return await response.Content.ReadFromJsonAsync<List<AgentDto>>(
+                   cancellationToken: cancellationToken)
+               ?? [];
+    }
+
+    public async Task<CreatePairingCodeResponse> CreatePairingCodeAsync(
+        string deviceId,
+        CancellationToken cancellationToken)
+    {
+        using var message = CreateAuthenticatedRequest(
+            HttpMethod.Post,
+            "api/agents/pairing-code");
+
+        message.Content = JsonContent.Create(new CreatePairingCodeRequest(deviceId));
+
+        var response = await _httpClient.SendAsync(message, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<CreatePairingCodeResponse>(
+                   cancellationToken: cancellationToken)
+               ?? throw new InvalidOperationException("Server returned an empty pairing response.");
+    }
+
+    public async Task BindAgentAsync(
+        Guid agentId,
+        Guid stationId,
+        CancellationToken cancellationToken)
+    {
+        using var message = CreateAuthenticatedRequest(
+            HttpMethod.Post,
+            $"api/agents/{agentId}/bind");
+
+        message.Content = JsonContent.Create(new BindAgentRequest(stationId));
 
         var response = await _httpClient.SendAsync(message, cancellationToken);
         response.EnsureSuccessStatusCode();
