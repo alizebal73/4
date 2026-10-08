@@ -6,6 +6,7 @@ namespace GameNet.Application.Foundation;
 
 public interface IGameNetStore
 {
+    Task<IReadOnlyList<Operator>> ListOperatorsAsync(CancellationToken cancellationToken);
     Task<Operator?> FindOperatorByUserNameAsync(string userName, CancellationToken cancellationToken);
     Task<Operator?> GetOperatorAsync(Guid operatorId, CancellationToken cancellationToken);
     Task AddOperatorAsync(Operator operatorAccount, CancellationToken cancellationToken);
