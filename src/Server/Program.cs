@@ -32,6 +32,7 @@ builder.Services.AddScoped<OperatorAuthService>();
 builder.Services.AddScoped<StationService>();
 builder.Services.AddScoped<AgentService>();
 builder.Services.AddSignalR();
+builder.Services.AddHostedService<AgentPresenceMonitor>();
 
 var app = builder.Build();
 
