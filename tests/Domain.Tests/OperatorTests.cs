@@ -1,3 +1,5 @@
+using Xunit;
+
 using GameNet.Domain.Identity;
 
 namespace GameNet.Domain.Tests;
