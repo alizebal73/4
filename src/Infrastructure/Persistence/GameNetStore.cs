@@ -8,6 +8,10 @@ namespace GameNet.Infrastructure.Persistence;
 
 public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
 {
+    public async Task<IReadOnlyList<Operator>> ListOperatorsAsync(
+        CancellationToken cancellationToken) =>
+        await db.Operators.OrderBy(x => x.UserName).ToListAsync(cancellationToken);
+
     public Task<Operator?> FindOperatorByUserNameAsync(
         string userName,
         CancellationToken cancellationToken) =>
