@@ -3,4 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>GameNet.Application</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\GameNet.Domain.csproj" />
+  </ItemGroup>
 </Project>
