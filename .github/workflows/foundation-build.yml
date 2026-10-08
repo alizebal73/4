@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 20
     steps:
       - name: Checkout
@@ -23,4 +23,4 @@ jobs:
       - name: Build
         run: dotnet build GameNet.slnx --configuration Release --no-restore
       - name: Test
-        run: dotnet test tests/Domain.Tests/GameNet.Domain.Tests.csproj --configuration Release --no-build
+        run: dotnet test tests/GameNet.Domain.Tests/GameNet.Domain.Tests.csproj --configuration Release --no-build

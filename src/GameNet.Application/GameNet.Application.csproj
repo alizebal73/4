@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><RootNamespace>GameNet.Application</RootNamespace></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../GameNet.Contracts/GameNet.Contracts.csproj" />
+    <ProjectReference Include="../GameNet.Domain/GameNet.Domain.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+.idea/
+TestResults/
+*.trx
+AppData/
+.env
+*.secrets.json

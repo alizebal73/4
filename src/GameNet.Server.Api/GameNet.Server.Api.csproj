@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup><RootNamespace>GameNet.Server.Api</RootNamespace></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../GameNet.Application/GameNet.Application.csproj" />
+    <ProjectReference Include="../GameNet.Contracts/GameNet.Contracts.csproj" />
+  </ItemGroup>
+</Project>

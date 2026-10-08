@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="src/GameNet.Contracts/GameNet.Contracts.csproj" />
+  <Project Path="src/GameNet.Domain/GameNet.Domain.csproj" />
+  <Project Path="src/GameNet.Application/GameNet.Application.csproj" />
+  <Project Path="src/GameNet.Infrastructure/GameNet.Infrastructure.csproj" />
+  <Project Path="src/GameNet.Server.Api/GameNet.Server.Api.csproj" />
+  <Project Path="src/GameNet.Desktop/GameNet.Desktop.csproj" />
+  <Project Path="src/GameNet.Agent/GameNet.Agent.csproj" />
+  <Project Path="tests/GameNet.Domain.Tests/GameNet.Domain.Tests.csproj" />
+</Solution>

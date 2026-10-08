@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RootNamespace>GameNet.Desktop</RootNamespace>
+    <AssemblyName>GameNet.Desktop</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../GameNet.Application/GameNet.Application.csproj" />
+    <ProjectReference Include="../GameNet.Contracts/GameNet.Contracts.csproj" />
+  </ItemGroup>
+</Project>
