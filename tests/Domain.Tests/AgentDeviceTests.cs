@@ -1,3 +1,5 @@
+using Xunit;
+
 using GameNet.Domain.Agents;
 
 namespace GameNet.Domain.Tests;
