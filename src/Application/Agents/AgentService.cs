@@ -127,9 +127,15 @@ public sealed class AgentService(
             cancellationToken);
     }
 
-    public async Task<IReadOnlyList<AgentDevice>> ListAsync(
+    public Task<IReadOnlyList<AgentDevice>> ListAsync(
         CancellationToken cancellationToken) =>
-        await store.ListAgentsAsync(cancellationToken);
+        store.ListAgentsAsync(cancellationToken);
+
+    public Task<bool> BindByOperatorAsync(
+        Guid agentId,
+        Guid stationId,
+        CancellationToken cancellationToken) =>
+        store.BindAgentToStationAsync(agentId, stationId, cancellationToken);
 
     private async Task<AgentDevice?> GetAuthorizedAgentAsync(
         string accessToken,
@@ -153,7 +159,7 @@ public sealed class AgentService(
     private static string CreateNumericCode()
     {
         Span<byte> bytes = stackalloc byte[4];
-        RandomNumberGenerator.Fill(bytes);
+        System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
         var value = BitConverter.ToUInt32(bytes) % 1_000_000;
         return value.ToString("D6");
     }
