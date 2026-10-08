@@ -29,6 +29,10 @@ public interface IGameNetStore
     Task<AgentDevice?> FindAgentByCredentialHashAsync(
         string credentialHash,
         CancellationToken cancellationToken);
+
+    Task<AgentDevice?> FindAgentByStationIdAsync(
+        Guid stationId,
+        CancellationToken cancellationToken);
     Task AddAgentAsync(AgentDevice agent, CancellationToken cancellationToken);
     Task<IReadOnlyList<AgentDevice>> ListAgentsAsync(CancellationToken cancellationToken);
 
