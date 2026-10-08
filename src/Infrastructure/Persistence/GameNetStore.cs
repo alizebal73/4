@@ -193,7 +193,7 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
         {
             await db.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException exception)
+        catch (DbUpdateConcurrencyException)
         {
             throw new ConcurrencyConflictException();
         }
