@@ -4,7 +4,7 @@ name: foundation-build
 
 on:
   push:
-    branches: ["main", "foundation/**"]
+    branches: ["main", "foundation/**", "feature/**"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
