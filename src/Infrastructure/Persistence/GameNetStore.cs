@@ -103,7 +103,9 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
         Guid stationId,
         CancellationToken cancellationToken)
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await db.Database.BeginTransactionAsync(
+            System.Data.IsolationLevel.Serializable,
+            cancellationToken);
 
         var agent = await db.AgentDevices.SingleOrDefaultAsync(
             x => x.Id == agentId,
@@ -113,6 +115,16 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
             cancellationToken);
 
         if (agent is null || station is null)
+        {
+            return false;
+        }
+
+        if (agent.StationId is not null && agent.StationId != stationId)
+        {
+            return false;
+        }
+
+        if (station.Lifecycle is Domain.Stations.StationLifecycle.Disabled)
         {
             return false;
         }
@@ -129,14 +141,13 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
 
         try
         {
-            station.BindAgent(agent.Id);
             agent.BindStation(station.Id);
 
             await db.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return true;
         }
-        catch
+        catch (Exception) when (transaction.GetDbTransaction().Connection is not null)
         {
             await transaction.RollbackAsync(cancellationToken);
             return false;
@@ -162,7 +173,6 @@ public sealed class GameNetStore(GameNetDbContext db) : IGameNetStore
             return false;
         }
 
-        station.UnbindAgent(agent.Id);
         agent.UnbindStation(station.Id);
 
         await db.SaveChangesAsync(cancellationToken);
