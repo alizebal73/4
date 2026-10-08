@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using GameNet.Application.Foundation;
 using GameNet.Domain.Identity;
 
@@ -18,7 +16,10 @@ public sealed class OperatorAuthService(
         string password,
         CancellationToken cancellationToken)
     {
-        var account = await store.FindOperatorByUserNameAsync(userName, cancellationToken);
+        var normalizedUserName = NormalizeUserName(userName);
+        var account = await store.FindOperatorByUserNameAsync(
+            normalizedUserName,
+            cancellationToken);
 
         if (account is null ||
             !account.IsActive ||
