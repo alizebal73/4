@@ -18,8 +18,8 @@ public sealed class AgentDevice
     public Guid Id { get; private set; }
     public string DeviceId { get; private set; } = string.Empty;
     public string DisplayName { get; private set; } = string.Empty;
-    public string CredentialHash { get; private set; } = string.Empty;
-    public string PairingCodeHash { get; private set; } = string.Empty;
+    public string? CredentialHash { get; private set; }
+    public string? PairingCodeHash { get; private set; }
     public DateTimeOffset? PairingExpiresAt { get; private set; }
     public AgentState State { get; private set; }
     public Guid? StationId { get; private set; }
@@ -40,6 +40,8 @@ public sealed class AgentDevice
 
     public void SetPairingCode(string codeHash, DateTimeOffset expiresAt)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(codeHash);
+
         PairingCodeHash = codeHash;
         PairingExpiresAt = expiresAt;
         State = AgentState.Registered;
@@ -49,13 +51,16 @@ public sealed class AgentDevice
         State is not AgentState.Disabled &&
         PairingExpiresAt is not null &&
         PairingExpiresAt > now &&
+        !string.IsNullOrWhiteSpace(PairingCodeHash) &&
         string.Equals(PairingCodeHash, codeHash, StringComparison.Ordinal);
 
     public void CompletePairing(string displayName, string credentialHash)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(credentialHash);
+
         DisplayName = string.IsNullOrWhiteSpace(displayName) ? DeviceId : displayName.Trim();
         CredentialHash = credentialHash;
-        PairingCodeHash = string.Empty;
+        PairingCodeHash = null;
         PairingExpiresAt = null;
         State = AgentState.Paired;
         ConnectionId = null;
@@ -73,6 +78,8 @@ public sealed class AgentDevice
         {
             throw new InvalidOperationException("Agent is not paired.");
         }
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(connectionId);
 
         LeaseVersion = checked(LeaseVersion + 1);
         ConnectionId = connectionId;
