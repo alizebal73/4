@@ -136,6 +136,11 @@
                                     Width="115"
                                     Height="36"
                                     Click="NewStation_Click"/>
+                            <Button Content="Agent ها"
+                                    Margin="8,0,0,0"
+                                    Width="90"
+                                    Height="36"
+                                    Click="ManageAgents_Click"/>
                             <Button Content="بازخوانی"
                                     Margin="8,0,0,0"
                                     Width="100"
