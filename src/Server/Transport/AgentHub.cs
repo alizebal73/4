@@ -1,9 +1,9 @@
 using GameNet.Application.Agents;
-using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.SignalR;
 
 namespace GameNet.Server.Transport;
 
-public sealed class AgentHub : Microsoft.AspNetCore.SignalR.Hub
+public sealed class AgentHub : Hub
 {
     public async Task<long?> OpenLease(
         AgentService agents,
@@ -37,7 +37,7 @@ public sealed class AgentHub : Microsoft.AspNetCore.SignalR.Hub
 
     private string? GetAccessToken()
     {
-        var httpContext = Context.Features.Get<IHttpContextFeature>()?.HttpContext;
+        var httpContext = Context.GetHttpContext();
         var token = httpContext?.Request.Headers.Authorization.ToString();
 
         if (token?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true)
@@ -46,28 +46,31 @@ public sealed class AgentHub : Microsoft.AspNetCore.SignalR.Hub
         }
 
         var queryToken = httpContext?.Request.Query["access_token"].ToString();
-
         return string.IsNullOrWhiteSpace(queryToken) ? null : queryToken;
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await DisconnectAsync();
+        var token = GetAccessToken();
+
+        if (token is not null)
+        {
+            await DisconnectAsync(token);
+        }
+
         await base.OnDisconnectedAsync(exception);
     }
 
-    private async Task DisconnectAsync()
+    private async Task DisconnectAsync(string token)
     {
-        var httpContext = Context.Features.Get<IHttpContextFeature>()?.HttpContext;
-        var token = GetAccessToken();
+        var agents = Context.GetHttpContext()?
+            .RequestServices
+            .GetRequiredService<AgentService>();
 
-        if (httpContext is null || token is null)
+        if (agents is null)
         {
             return;
         }
-
-        var agents = httpContext.RequestServices
-            .GetRequiredService<AgentService>();
 
         await agents.DisconnectAsync(
             token,
