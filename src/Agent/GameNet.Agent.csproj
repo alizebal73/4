@@ -4,7 +4,9 @@
     <RootNamespace>GameNet.Agent</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
     <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
   </ItemGroup>
 </Project>
