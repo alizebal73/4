@@ -64,6 +64,30 @@ public sealed class OperatorAuthService(
         return account is { IsActive: true } ? account : null;
     }
 
+    public async Task<bool> RevokeAsync(
+        string accessToken,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(accessToken))
+        {
+            return false;
+        }
+
+        var now = clock.UtcNow;
+        var session = await store.FindOperatorSessionByTokenHashAsync(
+            tokenGenerator.Hash(accessToken),
+            cancellationToken);
+
+        if (session is null || !session.IsValidAt(now))
+        {
+            return false;
+        }
+
+        session.Revoke(now);
+        await store.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     public static string NormalizeUserName(string userName) =>
         userName.Trim().ToUpperInvariant();
 }
