@@ -1,6 +1,5 @@
 using GameNet.Application.Identity;
 using GameNet.Contracts.Identity;
-using GameNet.Domain.Identity;
 using GameNet.Server.Security;
 
 namespace GameNet.Server.Endpoints;
