@@ -102,6 +102,21 @@ public sealed class AgentDevice
         return true;
     }
 
+    public bool ShouldBecomeStale(DateTimeOffset now, TimeSpan timeout) =>
+        State == AgentState.Online &&
+        LastSeenAt is not null &&
+        now - LastSeenAt >= timeout;
+
+    public void MarkStale(DateTimeOffset now)
+    {
+        if (State == AgentState.Online)
+        {
+            State = AgentState.Stale;
+            ConnectionId = null;
+            LastSeenAt = now;
+        }
+    }
+
     public void Disconnect(string connectionId, DateTimeOffset now)
     {
         if (string.Equals(ConnectionId, connectionId, StringComparison.Ordinal))
