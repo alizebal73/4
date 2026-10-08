@@ -90,6 +90,17 @@ public partial class MainWindow
         OpenEditStation(station);
     }
 
+    private void ManageAgents_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new AgentManagementWindow(_apiClient, _allStations)
+        {
+            Owner = this
+        };
+
+        window.ShowDialog();
+        _ = LoadStationsAsync();
+    }
+
     private void NewStation_Click(object sender, RoutedEventArgs e)
     {
         _creatingStation = true;
